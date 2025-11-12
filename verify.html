@@ -1,0 +1,55 @@
+<!-- verify.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Verify PWD</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+  <main class="container" style="width:600px;">
+    <h1 class="title">Verify PWD (Scan / Enter Token)</h1>
+
+    <!-- In production, QR scanner should open this page with ?token=... or POST to verify.php -->
+    <label>Verification Token</label>
+    <input type="text" id="tokenInput" placeholder="Paste token here">
+
+    <button id="verifyBtn" class="btn">Verify</button>
+    <div id="result" style="margin-top:16px;"></div>
+
+    <p style="margin-top:12px;"><a href="dashboard.html" class="btn">Back to Dashboard</a></p>
+  </main>
+
+  <script>
+    document.getElementById('verifyBtn').addEventListener('click', function () {
+      const token = document.getElementById('tokenInput').value.trim();
+      if (!token) {
+        alert('Please paste a token from the QR code.');
+        return;
+      }
+
+      // fetch verify.php?token=... (server-side returns an HTML snippet; we will render it)
+      fetch('verify.php?token=' + encodeURIComponent(token))
+        .then(response => response.text())
+        .then(html => {
+          // Inject server response into result area
+          document.getElementById('result').innerHTML = html;
+        })
+        .catch(err => {
+          document.getElementById('result').innerHTML = '<p style="color:red;">Verification failed. Try again.</p>';
+          console.error(err);
+        });
+    });
+
+    // If page opened with ?token=... auto-verify
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('token')) {
+        document.getElementById('tokenInput').value = params.get('token');
+        document.getElementById('verifyBtn').click();
+      }
+    })();
+  </script>
+</body>
+</html>
