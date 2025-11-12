@@ -1,3 +1,4 @@
+/* style.css - main form styles (monochrome, Calibri) */
 body {
   font-family: Calibri, sans-serif;
   background-color: #f2f2f2;
@@ -21,6 +22,7 @@ body {
   text-transform: uppercase;
   margin-bottom: 20px;
   border-bottom: 2px solid #000;
+  padding-bottom: 6px;
 }
 
 h2 {
@@ -28,6 +30,7 @@ h2 {
   font-weight: bold;
   margin-top: 20px;
   border-bottom: 1px solid #000;
+  padding-bottom: 6px;
 }
 
 label {
@@ -42,6 +45,7 @@ input, select {
   border: 1px solid #333;
   background-color: #fff;
   color: #000;
+  box-sizing: border-box;
 }
 
 input:focus, select:focus {
@@ -69,3 +73,55 @@ input:focus, select:focus {
 .btn:hover {
   background-color: #333;
 }
+
+/* --- Dashboard / layout additions --- */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  background: #111;
+  color: #fff;
+  padding: 20px;
+  box-shadow: 4px 0 0 #000;
+}
+
+.sidebar a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  margin: 8px 0;
+  padding: 8px;
+}
+
+.sidebar a:hover { background: #333; }
+
+.main-area {
+  flex: 1;
+  padding: 24px;
+}
+
+.header {
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header .logout-btn {
+  background:transparent;
+  border:1px solid #000;
+  padding:6px 10px;
+  cursor:pointer;
+}
+.table {
+  border-collapse: collapse;
+  width:100%;
+  margin-top:12px;
+}
+.table th, .table td {
+  border:1px solid #000;
+  padding:8px;
+  text-align:left;
+}
+.qr-thumb { width: 80px; height: auto; object-fit: cover; }
