@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PWD Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    /* Additional styles for dashboard sections */
+    .main-area h2 {
+      font-size: 20px; font-weight:bold;
+      border-bottom: 1px solid #222; padding-bottom: 6px; margin-top: 24px;
+    }
+    #dropZone {
+      border:2px dashed #333;
+      padding:28px;
+      text-align:center;
+      cursor:pointer;
+      background:#f9f9f9;
+      margin-bottom:16px;
+      transition:.15s;
+    }
+    #dropZone.dragover { background: #e0eaff; border-color: #3377ff; }
+    #scanner { width:320px;height:240px; border:1.5px solid #222; background:#fafafd; box-shadow:0 1px 2px #ccc; }
+    #scanResult { margin:14px 0; font-size:16px;}
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <h3>PWD Portal</h3>
+      <a href="dashboard.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="verify.html">Verify</a>
+      <a href="deals.html">Deals</a>
+      <a href="settings.html">Settings</a>
+      <hr>
+      <a href="logout.php" style="color:#ffdddd;">Logout</a>
+    </aside>
+    <section class="main-area">
+      <div class="topbar">
+        <div id="welcomeMsg">Welcome</div>
+      </div>
+
+      <h2>Your Profile & Verification QR</h2>
+      <div id="usersContainer">Loading profile...</div>
+
+      <h2>Upload/Update ID Image</h2>
+      <form id="uploadForm" action="upload_id.php" method="POST" enctype="multipart/form-data">
+        <div id="dropZone">
+          <p>
+          Drag &amp; drop your ID image here,<br>
+          or <span id="filePickerText" style="font-weight:bold;color:#144aec;cursor:pointer;">browse</span> for a file.
+          </p>
+          <input type="file" name="id_image" id="id_image" accept="image/*" style="display:none;" />
+        </div>
+        <button type="submit" class="btn">Upload</button>
+      </form>
+
+      <h2>Scan PWD QR Code</h2>
+      <div id="scanner"></div>
+      <p id="scanResult"></p>
+      <button onclick="location.href='verify.html'" class="btn">Manual Verification</button>
+    </section>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // 1. PROFILE DATA AJAX
+  fetch('dashboard_api.php')
+    .then(resp => resp.json())
+    .then(data => {
+      let user = data.find(u => u.PWD_ID == sessionStorage.getItem('PWD_ID'));
+      if (!user) { user = data[0]; }
+      let html =
+        `<p><b>Name:</b> ${user.FullName}</p>
+         <p><b>Date of Birth:</b> ${user.DateOfBirth}</p>
+         <p><b>Gender:</b> ${user.Gender}</p>
+         <p><b>Disability:</b> ${user.DisabilityType}</p>
+         ${user.QR_Path ? `<p><b>QR:</b><br><img src='${user.QR_Path}' class="qr-thumb"></p>` : ''}
+         ${user.ID_Image ? `<p><b>Uploaded ID:</b><br><img src='${user.ID_Image}' style="max-width:140px;"></p>` : ''}`;
+      document.getElementById('usersContainer').innerHTML = html;
+    })
+    .catch(() => document.getElementById('usersContainer').innerHTML = '<span style="color:red;">Failed to load profile.</span>');
+
+  // 2. DRAG&DROP UPLOAD
+  const dropZone = document.getElementById('dropZone')
+  const fileInput = document.getElementById('id_image')
+  document.getElementById('filePickerText').onclick = () => fileInput.click();
+  dropZone.onclick = (e) => { if (e.target !== fileInput && e.target !== filePickerText) fileInput.click(); }
+  dropZone.ondragover = e => { e.preventDefault(); dropZone.classList.add('dragover'); }
+  dropZone.ondragleave = e => { e.preventDefault(); dropZone.classList.remove('dragover'); }
+  dropZone.ondrop = e => {
+    e.preventDefault(); dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) fileInput.files = e.dataTransfer.files;
+  };
+
+  // 3. QR SCANNER
+  if (window.Html5Qrcode) {
+    const resultElem = document.getElementById('scanResult');
+    const qr = new Html5Qrcode("scanner");
+    Html5Qrcode.getCameras().then(devices => {
+      if (devices && devices.length) {
+        qr.start(
+          devices[0].id,
+          { fps: 10, qrbox: 180 },
+          qrCodeMessage => {
+            resultElem.innerHTML =
+              `<b>QR Token:</b> ${qrCodeMessage}<br>
+                <a href="verify.html?token=${encodeURIComponent(qrCodeMessage)}" class="btn">Verify This Token</a>`;
+            qr.stop();
+          }
+        );
+      }
+    }).catch(function (err) {
+      resultElem.textContent = "No camera found or unable to start QR scan.";
+    });
+  }
+  // Welcome notice
+  if (sessionStorage.getItem('justLoggedIn') === 'true') {
+    document.getElementById('welcomeMsg').innerText = "Welcome! You are logged in.";
+    sessionStorage.removeItem('justLoggedIn');
+  }
+});
+</script>
+</body>
+</html>
