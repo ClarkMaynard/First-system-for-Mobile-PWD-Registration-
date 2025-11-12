@@ -1,0 +1,40 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PWD Login</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+  <main class="container">
+    <h1 class="title">PWD Login</h1>
+
+    <!-- Post login to login.php (server-side handles authentication and redirect) -->
+    <form id="loginForm" action="login.php" method="POST">
+      <label>Username <span class="required">*</span></label>
+      <input type="text" name="Username" required>
+
+      <label>Password <span class="required">*</span></label>
+      <input type="password" name="Password" required>
+
+      <button type="submit" class="btn">Login</button>
+    </form>
+
+    <p style="margin-top:12px;">
+      Don't have an account? <a href="index.html">Register here</a>.
+    </p>
+  </main>
+
+  <script>
+    // Optional: basic client-side UX improvement (not a substitute for server validation)
+    document.getElementById('loginForm').addEventListener('submit', function(e){
+      const pw = this.querySelector('[name="Password"]').value;
+      if (pw.length < 4) {
+        alert('Password seems too short.');
+      }
+    });
+  </script>
+</body>
+</html>
