@@ -9,7 +9,8 @@
 <body>
   <main class="container">
     <h1 class="title">PWD Registration Form</h1>
-    <form id="pwdForm" action="register_pwd.php" method="POST">
+    <!-- enctype required for file upload -->
+    <form id="pwdForm" action="register_pwd.php" method="POST" enctype="multipart/form-data">
       
       <section>
         <h2>Personal Information</h2>
@@ -29,6 +30,9 @@
 
         <label>Disability Type <span class="required">*</span></label>
         <input type="text" name="DisabilityType" required>
+
+        <label>Upload ID (optional)</label>
+        <input type="file" name="IDImage" accept="image/*">
       </section>
 
       <section>
@@ -46,6 +50,8 @@
         <button type="reset" class="btn-secondary">Clear</button>
       </section>
     </form>
+
+    <p style="margin-top:12px;"><a href="login.html">Already registered? Log in</a></p>
   </main>
 </body>
 </html>
